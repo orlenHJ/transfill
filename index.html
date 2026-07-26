@@ -77,7 +77,7 @@
           <span id="progress-text">0 / 0</span>
         </div>
 
-        <div id="loading" class="loading" style="display:none">AI正在生成句子...</div>
+        <div id="loading" class="loading" style="display:none">AI 正在生成句子，请稍候...</div>
 
         <div class="chinese-text" id="chinese-text"></div>
         <div class="sentence-area" id="sentence-area"></div>
@@ -97,6 +97,10 @@
     <div id="view-review" class="view">
       <div class="card">
         <h2>标记的句子</h2>
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button class="btn btn-primary" onclick="App.exportBookmarks()">导出到文件</button>
+          <button class="btn btn-secondary" onclick="App.importBookmarks()">从文件导入</button>
+        </div>
         <div id="review-list" class="review-list" style="margin-top:16px"></div>
       </div>
     </div>

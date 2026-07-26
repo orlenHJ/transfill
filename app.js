@@ -40,6 +40,8 @@ const App = {
     this.currentIndex = 0;
     this.sentences = [];
 
+    this.showView('practice');
+
     if (aiService.isConfigured()) {
       this.showLoading(true);
       const aiSentences = await aiService.generateSentences(level, 10);
@@ -54,7 +56,6 @@ const App = {
       this.sentences = this.shuffle(pool).slice(0, 20);
     }
 
-    this.showView('practice');
     this.loadSentence();
   },
 
@@ -273,6 +274,52 @@ const App = {
         </div>
       </div>
     `).join('');
+  },
+
+  exportBookmarks() {
+    if (this.bookmarks.length === 0) {
+      alert('没有标记的句子可导出');
+      return;
+    }
+    const data = JSON.stringify(this.bookmarks, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'transfill-bookmarks.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  },
+
+  importBookmarks() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          if (!Array.isArray(data)) throw new Error('格式错误');
+          let added = 0;
+          data.forEach(item => {
+            if (item.chinese && item.english && !this.bookmarks.some(b => b.chinese === item.chinese)) {
+              this.bookmarks.push(item);
+              added++;
+            }
+          });
+          localStorage.setItem('bookmarks', JSON.stringify(this.bookmarks));
+          this.renderReview();
+          alert(`导入完成，新增 ${added} 条`);
+        } catch (err) {
+          alert('文件格式错误，请选择正确的标记文件');
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
   },
 
   removeBookmark(index) {
