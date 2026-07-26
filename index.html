@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TransFill 译填</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>TransFill 译填</h1>
+      <p>看中文，写英文，每天进步一点点</p>
+    </div>
+
+    <nav class="nav">
+      <button data-view="home" class="active">首页</button>
+      <button data-view="practice">练习</button>
+      <button data-view="review">复习</button>
+      <button data-view="settings">设置</button>
+    </nav>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-item">
+        <div class="number" id="stat-total">0</div>
+        <div class="label">总题数</div>
+      </div>
+      <div class="stat-item">
+        <div class="number" id="stat-correct">0</div>
+        <div class="label">正确数</div>
+      </div>
+      <div class="stat-item">
+        <div class="number" id="stat-streak">0</div>
+        <div class="label">连续正确</div>
+      </div>
+    </div>
+
+    <!-- HOME -->
+    <div id="view-home" class="view active">
+      <div class="card">
+        <h2>选择难度开始练习</h2>
+        <div class="level-selector">
+          <button class="level-btn" onclick="App.startPractice('beginner')">
+            <div class="level-info">
+              <h3>初级</h3>
+              <p>简单日常用语，基础语法和常见词汇</p>
+            </div>
+            <span class="arrow">&rarr;</span>
+          </button>
+          <button class="level-btn" onclick="App.startPractice('intermediate')">
+            <div class="level-info">
+              <h3>中级</h3>
+              <p>较复杂的日常和工作用语，包含从句和时态变化</p>
+            </div>
+            <span class="arrow">&rarr;</span>
+          </button>
+          <button class="level-btn" onclick="App.startPractice('advanced')">
+            <div class="level-info">
+              <h3>高级</h3>
+              <p>复杂句式，高级语法结构如虚拟语气、倒装句</p>
+            </div>
+            <span class="arrow">&rarr;</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRACTICE -->
+    <div id="view-practice" class="view">
+      <div class="card">
+        <div class="progress-bar">
+          <span id="level-badge">初级</span>
+          <div class="progress-track">
+            <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+          </div>
+          <span id="progress-text">0 / 0</span>
+        </div>
+
+        <div id="loading" class="loading" style="display:none">AI正在生成句子...</div>
+
+        <div class="chinese-text" id="chinese-text"></div>
+        <div class="sentence-area" id="sentence-area"></div>
+        <div class="feedback" id="feedback"></div>
+
+        <div class="actions">
+          <button class="btn btn-primary" onclick="App.checkAnswer()">检查</button>
+          <button class="btn btn-warning" onclick="App.giveHint()">提示</button>
+          <button class="btn btn-success" onclick="App.nextSentence()">下一个</button>
+          <button class="btn btn-secondary" id="btn-bookmark" onclick="App.toggleBookmark()">标记</button>
+          <button class="btn btn-secondary" onclick="App.showAnswer()">显示答案</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- REVIEW -->
+    <div id="view-review" class="view">
+      <div class="card">
+        <h2>标记的句子</h2>
+        <div id="review-list" class="review-list" style="margin-top:16px"></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="view-settings" class="view">
+      <div class="card">
+        <h2>DeepSeek API 设置</h2>
+        <p style="color:var(--text-light);margin:8px 0 20px;font-size:14px">
+          配置后可使用AI生成无限新句子。不配置则使用内置句库。
+          <br>API状态: <strong id="api-status">未配置</strong>
+        </p>
+        <div class="form-group">
+          <label>API Key</label>
+          <input type="password" id="api-key" placeholder="sk-...">
+          <p class="hint">在 platform.deepseek.com 获取</p>
+        </div>
+        <div class="form-group">
+          <label>API Endpoint</label>
+          <input type="text" id="api-endpoint" placeholder="https://api.deepseek.com/v1/chat/completions">
+        </div>
+        <div class="form-group">
+          <label>模型名称</label>
+          <input type="text" id="api-model" placeholder="deepseek-v4-flash">
+        </div>
+        <button class="btn btn-primary" onclick="App.saveSettings()">保存设置</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="sentences.js"></script>
+  <script src="ai-service.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
