@@ -48,6 +48,8 @@ const App = {
       this.showLoading(false);
       if (aiSentences) {
         this.sentences = aiSentences;
+      } else {
+        this.showNotice('AI 生成失败，已切换到内置句库');
       }
     }
 
@@ -105,9 +107,17 @@ const App = {
         input.type = 'text';
         input.dataset.index = i;
         input.dataset.answer = word;
-        input.style.width = Math.max(60, word.length * 12 + 20) + 'px';
         input.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') this.checkAnswer();
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            const allInputs = Array.from(area.querySelectorAll('input'));
+            const idx = allInputs.indexOf(input);
+            if (idx < allInputs.length - 1) {
+              allInputs[idx + 1].focus();
+            } else {
+              this.checkAnswer();
+            }
+          }
         });
         area.appendChild(input);
       } else {
@@ -179,14 +189,20 @@ const App = {
   giveHint() {
     if (this.isChecked) return;
     const inputs = document.querySelectorAll('#sentence-area input');
-    const emptyInputs = Array.from(inputs).filter(i => !i.value);
-    const target = emptyInputs[0] || inputs[0];
+    const focused = document.activeElement;
+    let target = null;
+
+    if (focused && focused.tagName === 'INPUT' && focused.closest('#sentence-area')) {
+      target = focused;
+    } else {
+      target = Array.from(inputs).find(i => !i.value) || inputs[0];
+    }
 
     if (target) {
       const answer = target.dataset.answer;
-      this.hintCount++;
-      const revealCount = Math.min(this.hintCount, answer.length);
-      target.value = answer.substring(0, revealCount);
+      const current = target.value.length;
+      const revealCount = current + 1;
+      target.value = answer.substring(0, Math.min(revealCount, answer.length));
       target.focus();
       target.style.borderColor = 'var(--warning)';
     }
@@ -194,6 +210,10 @@ const App = {
 
   // Next sentence
   nextSentence() {
+    if (!this.isChecked) {
+      this.showNotice('请先点击"检查"或"显示答案"');
+      return;
+    }
     this.currentIndex++;
     this.loadSentence();
   },
@@ -255,6 +275,13 @@ const App = {
   showLoading(show) {
     const el = document.getElementById('loading');
     if (el) el.style.display = show ? 'flex' : 'none';
+  },
+
+  showNotice(msg) {
+    const feedback = document.getElementById('feedback');
+    feedback.textContent = msg;
+    feedback.className = 'feedback show error';
+    setTimeout(() => { feedback.className = 'feedback'; }, 3000);
   },
 
   // Review
